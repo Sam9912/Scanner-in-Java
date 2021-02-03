@@ -7,6 +7,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
+//import java.util.regex.Matcher;
+//import java.util.regex.Pattern;
 
 public class gui extends JFrame {
     private JPanel jframe;
@@ -20,6 +22,7 @@ public class gui extends JFrame {
     private JPanel tablepanel;
     private JButton fileupload;
     private JLabel filelabel;
+    private JButton removeCommentsButton;
     String value;
     String[] output;
     boolean numflag=true;
@@ -30,12 +33,12 @@ public class gui extends JFrame {
     String[] num =  {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
     final String[] symbols = {"&", "|", "+", "-", "*", ",", "/", "%", "+", "-", "=", "<","<=", ">",">=","==","!=","!", "[", "]", "{", "}", "(", ")", ".", ";", ":","&&", "||"};
     final String[] keywords = {"abstract", "assert",
-            "boolean", "break", "byte", "case", "catch", "char", "class", "const",
+            "Boolean", "break", "byte", "case", "catch", "char", "class", "const",
             "continue", "default", "do", "double", "else",
             "enum", "extends", "final", "finally", "float",
             "for", "goto", "if", "implements", "import",
             "instanceof", "int", "interface", "long", "native",
-            "new", "package", "private", "protected", "public",
+            "new","String", "package", "private", "protected", "public",
             "return", "short", "static", "strictfp", "uper",
             "switch", "synchronized", "this", "throw", "throws",
             "transient", "try", "void", "volatile", "while", "true", "NULL", "false"};
@@ -54,11 +57,21 @@ public class gui extends JFrame {
     public void createtable() {
         model = new DefaultTableModel(columnNames, 0);
         value = textArea1.getText();
-        String output1 = value.replaceAll("//.*?\n", "\n");
+        String output1 = value.replaceAll("//.*?\n", " ");
         String output2 = output1.replaceAll("/\\*([^*]|[\\r\\n])*\\*/", "\n");
         output = output2.split("\\s+");
         for (int i = 0; i < output.length; i++) {
 
+
+
+            if(output[i].matches("\".*?\""))
+            {
+                model.addRow(new Object[]{output[i], "String Literal", tokencount});
+            }
+            if(output[i].matches("'[\\w\\s]+'"))
+            {
+                model.addRow(new Object[]{output[i], "character Literal", tokencount});
+            }
 
             if( output[i].matches("[ a-zA-Z]+")) {
                 for (int j = 0; j < keywords.length; j++) {
@@ -125,6 +138,11 @@ public class gui extends JFrame {
                             model.addRow(new Object[]{output[i], "Assignment Operator", tokencount});
                             symbflag=true;
                             break;
+                        case ";":
+                            tokencount++;
+                            model.addRow(new Object[]{output[i], "semi colon", tokencount});
+                            symbflag=true;
+                            break;
                         default:
                             tokencount++;
                             model.addRow(new Object[]{output[i], "Symbols", tokencount});
@@ -132,9 +150,18 @@ public class gui extends JFrame {
                             break;
                     }
 
-                    table1.setModel(model);
+
 
             }
+//                if(output[i].matches(" \" "))
+//                {
+//                    String result;
+//                    while(!output[i + 1].equals("\" ")) {
+//                        result=output[i].toString();
+//                    }
+//                    model.addRow(new Object[]{output[i], "String literal", tokencount});
+//                }
+            table1.setModel(model);
 
 
 
@@ -146,6 +173,20 @@ public class gui extends JFrame {
 
 //        table1.setModel(new DefaultTableModel(data,columnNames));
 //         model = new DefaultTableModel(new Object[]{"column1", "column2"}, 0);
+
+
+//            Pattern pattern = Pattern.compile("\".*?\"");
+//            Matcher m = pattern.matcher(output[i]);
+//            while (m.find()) {
+//                tokencount++;
+//                model.addRow(new Object[]{output[i], "String Literal", tokencount});
+//            }
+//            Pattern p = Pattern.compile("'[\\w\\s]+'");
+//            Matcher match = p.matcher(output[i]);
+//            while (match.find()) {
+//                tokencount++;
+//                model.addRow(new Object[]{output[i], "character Literal", tokencount});
+//            }
 
 //        model.addColumn("workplace");
 //        model.addRow(new Object[]{"jack", "roger", "home"});
@@ -218,6 +259,7 @@ public class gui extends JFrame {
             filepicker();
             }
         });
+
     }
     }
 
